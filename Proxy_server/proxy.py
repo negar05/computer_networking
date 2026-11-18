@@ -1,4 +1,3 @@
-
 from socket import *
 
 proxyPort = 8888
@@ -14,6 +13,7 @@ print("Web Proxy is ready...")
 while True:
 
     clientSocket, clientAddress = proxySocket.accept()
+    print ("client connected: ", clientAddress)
 
     try:
         
@@ -31,9 +31,17 @@ while True:
             clientSocket.close()
             continue
 
+        print("request data before decode: ",requestData)
         requestText = requestData.decode("iso-8859-1")
+        print("request data after decode: ",requestText)
+
 
         lines = requestText.split("\r\n")
+        
+        for i in lines :
+            print (i)
+        
+        
         requestLine = lines[0].split()
 
         if len(requestLine) < 3:
@@ -107,11 +115,11 @@ while True:
             + "\r\n".join(headers)
             + "\r\n\r\n"
         )
-
+        print (newRequest)
 
         originSocket = socket(AF_INET, SOCK_STREAM)
         originSocket.settimeout(10)
-
+        
         originSocket.connect((serverHost, serverPort))
 
 
@@ -120,6 +128,8 @@ while True:
         )
 
 
+        totalBytes = 0
+
         while True:
 
             responseData = originSocket.recv(4096)
@@ -127,7 +137,14 @@ while True:
             if not responseData:
                 break
 
+            totalBytes += len(responseData)
+
             clientSocket.sendall(responseData)
+
+            print("Response forwarded:", len(responseData), "bytes")
+
+        print("Response successfully forwarded to client!")
+        print("Total response size:", totalBytes, "bytes")
 
         originSocket.close()
         clientSocket.close()

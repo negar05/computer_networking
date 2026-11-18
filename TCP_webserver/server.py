@@ -4,16 +4,22 @@ import sys
 serverSocket = socket(AF_INET, SOCK_STREAM)
 
 
-serverPort = 6789
+serverPort = 6779
 serverSocket.bind(("", serverPort))
 serverSocket.listen(1)
 
 while True:
     print('Ready to serve...')
     connectionSocket, addr = serverSocket.accept()
+    print(connectionSocket)
+    print ( addr)
 
     try:
-        message = connectionSocket.recv(1024).decode()
+        message = connectionSocket.recv(1024)
+        print ()
+
+        print ( message)
+
         filename = message.split()[1]
         f = open(filename[1:])
         outputdata = f.read()
